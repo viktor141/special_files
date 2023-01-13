@@ -9,9 +9,6 @@ import com.opencsv.CSVReader;
 import com.opencsv.bean.ColumnPositionMappingStrategy;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
@@ -41,7 +38,7 @@ public class Main {
 
 
         List<Employee> list3 = jsonToList(json3);
-        for (Employee employee: list3) {
+        for (Employee employee : list3) {
             System.out.println(employee);
         }
     }
@@ -49,7 +46,7 @@ public class Main {
     private static List<Employee> jsonToList(String json) {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
-        JsonArray jsonElements = new JsonArray();
+        JsonArray jsonElements;
         JsonParser parser = new JsonParser();
         List<Employee> employees = new ArrayList<>();
         Object obj = parser.parse(json);
@@ -85,18 +82,28 @@ public class Main {
             NodeList employeesList = root.getChildNodes();
             for (int i = 0; i < employeesList.getLength(); i++) {
                 Node node = employeesList.item(i);
-                if (node.getNodeType() == Node.ELEMENT_NODE){
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
                     NodeList employeeAttributes = node.getChildNodes();
                     Employee employee = new Employee();
                     for (int j = 0; j < employeeAttributes.getLength(); j++) {
                         Node elNode = employeeAttributes.item(j);
-                        if(elNode.getNodeType() == Node.ELEMENT_NODE){
-                            switch (elNode.getNodeName()){
-                                case "id" : employee.id = Long.parseLong(getDataFromNode(elNode));break;
-                                case "firstName" : employee.firstName = getDataFromNode(elNode);break;
-                                case "lastName" : employee.lastName = getDataFromNode(elNode);break;
-                                case "country" : employee.country = getDataFromNode(elNode); break;
-                                case "age" : employee.age = Integer.parseInt(getDataFromNode(elNode)); break;
+                        if (elNode.getNodeType() == Node.ELEMENT_NODE) {
+                            switch (elNode.getNodeName()) {
+                                case "id":
+                                    employee.id = Long.parseLong(getDataFromNode(elNode));
+                                    break;
+                                case "firstName":
+                                    employee.firstName = getDataFromNode(elNode);
+                                    break;
+                                case "lastName":
+                                    employee.lastName = getDataFromNode(elNode);
+                                    break;
+                                case "country":
+                                    employee.country = getDataFromNode(elNode);
+                                    break;
+                                case "age":
+                                    employee.age = Integer.parseInt(getDataFromNode(elNode));
+                                    break;
                             }
                         }
                     }
@@ -111,12 +118,12 @@ public class Main {
         return list;
     }
 
-    private static String getDataFromNode(Node node){
+    private static String getDataFromNode(Node node) {
         return node.getChildNodes().item(0).getNodeValue();
     }
 
     private static void writeString(String s, String fileName) {
-        try (FileWriter fileWriter = new FileWriter(fileName)){
+        try (FileWriter fileWriter = new FileWriter(fileName)) {
 
             fileWriter.write(s);
         } catch (IOException e) {
@@ -128,13 +135,14 @@ public class Main {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
 
-        Type listType = new TypeToken<List<Employee>>() {}.getType();
+        Type listType = new TypeToken<List<Employee>>() {
+        }.getType();
         return gson.toJson(list, listType);
     }
 
     private static List<Employee> parseCSV(String[] columnMapping, String fileName) {
         List<Employee> staff;
-        try(CSVReader reader = new CSVReader(new FileReader(fileName))){
+        try (CSVReader reader = new CSVReader(new FileReader(fileName))) {
             ColumnPositionMappingStrategy<Employee> strategy = new ColumnPositionMappingStrategy<>();
             strategy.setType(Employee.class);
             strategy.setColumnMapping(columnMapping);
